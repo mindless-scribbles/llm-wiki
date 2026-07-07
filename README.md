@@ -18,13 +18,14 @@ Three operations drive the workflow:
 
 | Operation | Trigger | What happens |
 |-----------|---------|--------------|
-| **Ingest** | "ingest raw/my-source.txt" | LLM reads the source, creates a summary page, creates/updates concept and entity pages, adds cross-links, updates the index and log |
+| **Ingest** | "ingest raw/my-source.txt" | LLM reads the source, creates a summary page, creates/updates concept and entity pages, adds cross-links, updates the index and log, and rebuilds the HTML site |
 | **Query** | Ask any question | LLM searches the wiki, synthesizes an answer with citations, optionally creates a synthesis page for novel insights |
 | **Lint** | "lint" or "health check" | LLM audits all pages for orphans, contradictions, missing links, incomplete sections, and low-confidence claims — fixes what it can, reports the rest |
 
 ## Quick Start
 
 1. **Clone this repo**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/llm-wiki.git my-knowledge-base
    cd my-knowledge-base
@@ -34,6 +35,7 @@ Three operations drive the workflow:
    - Update the Purpose section with your topic
    - Replace the placeholder tagging taxonomy with your own categories
    - Adjust confidence level descriptions if needed
+   - Set your site branding in `site.config.json` (title, brand letters, footer, accent)
    - Everything else (workflows, page formats, linking rules) works as-is
 
 3. **Drop sources into `raw/`**
@@ -41,21 +43,27 @@ Three operations drive the workflow:
    - These are immutable once added; the LLM never modifies them
 
 4. **Tell the LLM to ingest**
+
    ```
    ingest raw/my-first-source.txt
    ```
+
    The LLM will create summary pages, concept pages, entity pages, cross-links, and update the index.
 
 5. **Ask questions**
+
    ```
    What are the key differences between X and Y?
    ```
+
    The LLM answers from the wiki, citing specific pages.
 
 6. **Run health checks**
+
    ```
    lint
    ```
+
    The LLM audits the wiki and fixes issues.
 
 ## Directory Structure
@@ -63,6 +71,10 @@ Three operations drive the workflow:
 ```
 .
 ├── CLAUDE.md                      # Schema — the LLM's instructions
+├── build-site.mjs                 # Renders wiki/ → a static HTML site
+├── site.config.json               # HTML site branding (title, accent, ...)
+├── widgets/                       # Optional interactive concept visualizations
+├── site/                          # Generated HTML output (git-ignored)
 ├── raw/                           # Your source documents (immutable)
 └── wiki/
     ├── index.md                   # Master catalog of all pages
@@ -83,25 +95,49 @@ Three operations drive the workflow:
 
 This template includes several extras beyond the core wiki pattern:
 
+### Static HTML Site (`build-site.mjs`)
+
+Every wiki ships with a companion static website in a dark "Field Logs" journal
+aesthetic — a numbered catalog sidebar, typographic hero, and cross-linked pages.
+The LLM regenerates it after every ingest, so the site never lags the wiki:
+
+```bash
+node build-site.mjs        # writes ./site/ — open site/index.html
+```
+
+Branding (name, brand letters, footer, accent color) lives in `site.config.json`,
+so adapting it to a new domain is a one-file change. No dependencies, Node 18+,
+no network needed to build. Concept pages can also carry bespoke **interactive
+canvas visualizations** — drop a `widgets/<slug>.js` matching the concept
+filename and the build injects it automatically (see `widgets/README.md`). Full
+details in [`BUILD-SITE.md`](BUILD-SITE.md).
+
 ### Dataview Dashboard (`wiki/dashboard.md`)
+
 Live queries that surface low-confidence pages, recent updates, concepts by tag, and pages with the most sources. Requires the [Dataview](https://github.com/blacksmithgu/obsidian-dataview) Obsidian plugin.
 
 ### Charts View Analytics (`wiki/analytics.md`)
+
 Visual analytics with pie charts, bar charts, and word clouds. Requires the [Charts View](https://github.com/caronchen/obsidian-chartsview-plugin) Obsidian plugin.
 
 ### Mermaid Diagrams
+
 Use Mermaid code blocks in any wiki page to create flowcharts, sequence diagrams, or concept maps. Native support in Obsidian and GitHub.
 
 ### Marp Slides (`wiki/presentations/`)
+
 Create slide decks from markdown using [Marp](https://marp.app/). Drop presentation files in this directory.
 
 ### Research Journal (`wiki/journal/`)
+
 Track your research sessions, experiments, or applied work with the included template. The LLM can reference journal entries when answering queries.
 
 ### Spaced Repetition (`wiki/flashcards.md`)
+
 Flashcards in the format used by the [Spaced Repetition](https://github.com/st3v3nmw/obsidian-spaced-repetition) Obsidian plugin. Ask the LLM to generate flashcards from any wiki page.
 
 ### MCP Server
+
 This repo works with Claude Code's MCP server capabilities. Point an MCP-compatible client at this repo and the LLM can read/write the wiki programmatically.
 
 ## Customizing for Your Domain
