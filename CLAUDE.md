@@ -17,6 +17,7 @@ This is an LLM-maintained knowledge base on [YOUR TOPIC]. The LLM writes and mai
 - `wiki/syntheses/` — Comparison tables, decision frameworks, cross-cutting analyses.
 - `wiki/journal/` — Research or session journal entries.
 - `wiki/presentations/` — Marp slide decks generated from wiki content.
+- `wiki/tutorials/` — Step-by-step, timecode-linked tutorials distilled from timecoded transcript pages (mirrors the source page's path under `wiki/`). Each step links to the exact transcript moment — a heading link in Obsidian, a click-to-popover on the site. See the **Add Tutorial** workflow and the `add-tutorial` skill.
 - `build-site.mjs` — LLM-maintained build tool (project root, **outside `wiki/`**) that renders the wiki into a static HTML site. Regenerable; safe to re-run any time.
 - `site.config.json` — Branding for the HTML site (title, brand letters, footer, accent color).
 - `widgets/` — Optional interactive concept visualizations (`_viz.js` shared library + one `<slug>.js` per concept). See `widgets/README.md`.
@@ -43,6 +44,10 @@ sources: ["raw/filename.txt"]
 confidence: high | medium | low
 ---
 ```
+
+Tutorial pages (`wiki/tutorials/`) additionally set a `transcript: "<source-target>"` key
+naming the timecoded transcript they were distilled from — this is what enables the
+clickable-timecode popovers. See the **Add Tutorial** workflow.
 
 ### Required Sections by Page Type
 
@@ -115,6 +120,22 @@ When the user says "ingest [source]" or adds a file to `raw/`:
 7. Append to `wiki/log.md` with timestamp, source name, pages created/updated
 8. Flag any contradictions with existing wiki content
 9. **Rebuild the HTML site**: run `node build-site.mjs` (see Publish). This is a default step of every ingest — the site should never lag the wiki.
+
+### Add Tutorial
+
+When the user wants a **step-by-step tutorial** from a timecoded transcript (a page whose
+headings are `## MM:SS`), or asks to "break this lesson into steps" / "tie each step to a
+timecode", run the **`add-tutorial`** skill. In short:
+
+1. Normalize the transcript's timecode headings to have no brackets (`## [MM:SS]` → `## MM:SS`) —
+   Obsidian can't link to headings containing `[`/`]`.
+2. Write `wiki/tutorials/<same-path-as-source>.md` with a `transcript: "<source-target>"` key and
+   phased, numbered steps. Every step opens with a timecode wikilink `[[wiki/<source-target>#MM:SS|MM:SS]]`
+   whose `MM:SS` exactly matches a transcript heading (`HH:MM:SS` past the hour).
+3. Update `index.md` (a "Tutorials — Step-by-Step" section) and `log.md`, then rebuild.
+
+`build-site.mjs` renders those timecode wikilinks as pills that pop up the transcript chunk
+inline on the site, and they double as heading links in Obsidian. See `.claude/skills/add-tutorial/SKILL.md`.
 
 ### Publish
 
