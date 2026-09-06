@@ -18,9 +18,10 @@ The source must be a page with **timecoded headings** — lines like `## 00:30` 
 moment. These are usually lecture/video transcripts (often under `wiki/summaries/` or a
 section folder). If a source has no timecoded headings, this skill does not apply.
 
-Requires a `build-site.mjs` that supports timecode popovers (ships with the llm-wiki
-template — look for `buildTimecodeIndex` / `TC_SCRIPT`). If it's missing, the tutorial
-still works as plain text; copy the timecode feature from the template's `build-site.mjs`.
+Requires the [`llm-wiki-site`](https://github.com/mindless-scribbles/llm-wiki-site)
+builder, which renders the timecode popovers. If it isn't installed, write the tutorial
+anyway — it still works as plain text and as Obsidian heading links; only the site
+popovers are missing.
 
 ## The timecode contract (do not deviate)
 
@@ -34,9 +35,9 @@ still works as plain text; copy the timecode feature from the template's `build-
    - The `MM:SS` after `#` **must exactly match** a transcript heading (same digits, same
      `MM:SS` vs `HH:MM:SS` form). A mismatch renders as a dead `tc-missing` pill.
    - The `wiki/` prefix disambiguates the transcript from the same-named tutorial file in
-     Obsidian; `build-site.mjs` strips it when resolving. Use it on **all** links to the transcript.
+     Obsidian; the builder strips it when resolving. Use it on **all** links to the transcript.
 3. **The tutorial declares its source** via a `transcript:` frontmatter key naming the same
-   `<transcript-target>`. `build-site.mjs` only renders pills on pages that have this key.
+   `<transcript-target>`. Pills are only rendered on pages that have this key.
 
 ## Procedure — one lesson
 
@@ -70,7 +71,9 @@ still works as plain text; copy the timecode feature from the template's `build-
    Fix obvious ASR garbles in the prose, but keep the **timecodes** exact so the popover shows the raw source.
 6. **Update `wiki/index.md`** — add/extend a "Tutorials — Step-by-Step" section linking the new
    tutorial (`[[tutorials/<relative-path>|…]]`), and prefix transcript links with `wiki/` for Obsidian.
-7. **Append to `wiki/log.md`** and **rebuild**: `node build-site.mjs`.
+7. **Append to `wiki/log.md`** and **rebuild**: `llm-wiki-site build .` (or
+   `llm-wiki-site build --site <wiki-id>`). Note the output directory it prints — the
+   site is built outside the wiki, so the validation below needs that path.
 
 ## Procedure — many lessons at once
 
@@ -102,11 +105,15 @@ print(f"tokens={tok} bad={bad}")
 PY
 ```
 
-After `node build-site.mjs`, confirm zero dead pills:
-`grep -ro 'tc-missing' site/tutorials | wc -l` → should be `0`.
+After the rebuild, confirm zero dead pills in the **output** directory the build
+reported (it is outside the wiki):
+
+```bash
+grep -ro 'tc-missing' "$OUT/tutorials" | wc -l   # should be 0
+```
 
 ## Notes
 
-- The compact `@[MM:SS]` form is also accepted by `build-site.mjs` (site-only), but prefer the
+- The compact `@[MM:SS]` form is also accepted by the builder (site-only), but prefer the
   `[[wiki/…#MM:SS|MM:SS]]` wikilink so timecodes are clickable in Obsidian too.
 - Never modify `raw/`. The transcript pages under `wiki/` are editable (only heading brackets change).

@@ -2,6 +2,13 @@
 title: "Knowledge Base Index"
 type: index
 updated: 2026-04-08
+# Branding for the generated HTML site. Lives here, in markdown, so it travels
+# with the wiki even through an Obsidian Sync that only carries *.md.
+site:
+  title: "Knowledge Base"
+  brandLetters: "KB"
+  footer: "SYS.WIKI / 2026"
+  accent: "#ff3300"
 ---
 
 # Knowledge Base Index

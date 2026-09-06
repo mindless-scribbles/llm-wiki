@@ -3,5 +3,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 
-# Generated static site — rebuild any time with `node build-site.mjs`
+# Generated static HTML never belongs in a wiki — it is built outside this folder
+# by llm-wiki-site. Ignored here only to catch an accidental in-place build.
 site/

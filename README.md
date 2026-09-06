@@ -71,10 +71,7 @@ Three operations drive the workflow:
 ```
 .
 ├── CLAUDE.md                      # Schema — the LLM's instructions
-├── build-site.mjs                 # Renders wiki/ → a static HTML site
 ├── site.config.json               # HTML site branding (title, accent, ...)
-├── widgets/                       # Optional interactive concept visualizations
-├── site/                          # Generated HTML output (git-ignored)
 ├── raw/                           # Your source documents (immutable)
 └── wiki/
     ├── index.md                   # Master catalog of all pages
@@ -95,22 +92,29 @@ Three operations drive the workflow:
 
 This template includes several extras beyond the core wiki pattern:
 
-### Static HTML Site (`build-site.mjs`)
+### Static HTML Site ([`llm-wiki-site`](https://github.com/mindless-scribbles/llm-wiki-site))
 
-Every wiki ships with a companion static website in a dark "Field Logs" journal
+Every wiki has a companion static website in a dark "Field Logs" journal
 aesthetic — a numbered catalog sidebar, typographic hero, and cross-linked pages.
-The LLM regenerates it after every ingest, so the site never lags the wiki:
+The LLM regenerates it after every ingest, so the site never lags the wiki.
+
+The generator is a **separate repo**, because a wiki normally lives in an Obsidian
+vault and Obsidian Sync carries only `*.md`. Build machinery would never sync, and
+thousands of generated HTML files have no business in a vault. So this folder stays
+pure markdown, and the builder reads it from the outside:
 
 ```bash
-node build-site.mjs        # writes ./site/ — open site/index.html
+git clone https://github.com/mindless-scribbles/llm-wiki-site.git
+cd llm-wiki-site && npm link
+
+llm-wiki-site build /path/to/this/wiki --out ~/sites/my-wiki
 ```
 
 Branding (name, brand letters, footer, accent color) lives in `site.config.json`,
-so adapting it to a new domain is a one-file change. No dependencies, Node 18+,
-no network needed to build. Concept pages can also carry bespoke **interactive
-canvas visualizations** — drop a `widgets/<slug>.js` matching the concept
-filename and the build injects it automatically (see `widgets/README.md`). Full
-details in [`BUILD-SITE.md`](BUILD-SITE.md).
+or — for a synced vault — in a `site:` block in `wiki/index.md` frontmatter, which
+is the only form that travels with the notes. Concept pages can also carry bespoke
+**interactive canvas visualizations**, kept in the builder repo alongside the site
+registry. No dependencies, Node 18+, no network needed to build.
 
 ### Dataview Dashboard (`wiki/dashboard.md`)
 
