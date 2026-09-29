@@ -94,8 +94,9 @@ This template includes several extras beyond the core wiki pattern:
 
 ### Static HTML Site ([`llm-wiki-site`](https://github.com/mindless-scribbles/llm-wiki-site))
 
-Every wiki has a companion static website in a dark "Field Logs" journal
-aesthetic — a numbered catalog sidebar, typographic hero, and cross-linked pages.
+Every wiki has a companion static website styled with the **DDC Reel** design
+system ([artifact](https://claude.ai/artifact/QBTm2jQ8DC1f9bjhwiuDvw)): dark, monochrome, Syne / Space Mono / Hanken Grotesk,
+one orange accent, a numbered catalog sidebar, typographic hero, and cross-linked pages.
 The LLM regenerates it after every ingest, so the site never lags the wiki.
 
 The generator is a **separate repo**, because a wiki normally lives in an Obsidian

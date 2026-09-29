@@ -142,7 +142,8 @@ inline on the site, and they double as heading links in Obsidian. See `.claude/s
 
 ### Publish
 
-The wiki always has a companion static HTML site (Field Logs journal aesthetic),
+The wiki always has a companion static HTML site, styled with the **DDC Reel** design system
+(`ddc-reel` skill; https://claude.ai/artifact/QBTm2jQ8DC1f9bjhwiuDvw),
 built **outside this folder** by `llm-wiki-site`. Regenerate it after **any**
 change to `wiki/`:
 
@@ -163,7 +164,10 @@ llm-wiki-site build --site <wiki-id>
 #### Branding
 
 Set these when adapting the template to a new domain: `title`, `brandLetters`
-(exactly two), `footer`, `accent` (hex).
+(exactly two), `footer`, `accent` (hex). Keep `accent` at DDC Reel's `#ff3300` unless
+the user asks for another; the look itself (fonts, palette, components) comes from the
+builder and is the same for every wiki. For any other visual made from this wiki (a Marp
+deck, an Artifact, a widget), load the `ddc-reel` skill first.
 
 For a wiki inside an Obsidian vault, put them in the `site:` block of
 `wiki/index.md` frontmatter — that is markdown, so it is the only form that
@@ -173,10 +177,10 @@ actually syncs:
 ---
 title: "Knowledge Base Index"
 site:
-  title: "Trading Field Logs"
-  brandLetters: "TF"
+  title: "Options Trading KB"
+  brandLetters: "OT"
   footer: "SYS.TRADING_WIKI / 2026"
-  accent: "#33ccff"
+  accent: "#ff3300"
 ---
 ```
 

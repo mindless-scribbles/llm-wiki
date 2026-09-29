@@ -23,6 +23,16 @@ builder, which renders the timecode popovers. If it isn't installed, write the t
 anyway — it still works as plain text and as Obsidian heading links; only the site
 popovers are missing.
 
+## Design system: DDC Reel
+
+The site, pills and popovers render in the **DDC Reel** design system (`ddc-reel` skill at
+`~/.claude/skills/ddc-reel/`, artifact https://claude.ai/artifact/QBTm2jQ8DC1f9bjhwiuDvw). The builder owns that styling, so the
+tutorial markdown needs no design work. If you make anything visual from a tutorial beyond
+the markdown (a deck, an Artifact walkthrough, a widget, a mockup of a step), load the
+`ddc-reel` skill first and build on it. Follow its voice in the prose as well: plain, direct,
+craft vocabulary, no hype. Use the ⚠️ gotcha marker below sparingly; it's the one exception to
+DDC Reel's no-emoji rule, because Obsidian readers rely on it.
+
 ## The timecode contract (do not deviate)
 
 1. **Transcript headings carry no brackets.** Obsidian cannot link to a heading containing
