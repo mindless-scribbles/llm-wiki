@@ -126,4 +126,7 @@ grep -ro 'tc-missing' "$OUT/tutorials" | wc -l   # should be 0
 
 - The compact `@[MM:SS]` form is also accepted by the builder (site-only), but prefer the
   `[[wiki/…#MM:SS|MM:SS]]` wikilink so timecodes are clickable in Obsidian too.
+- One tutorial can cite **several transcripts**: each timecode link's own target decides which
+  transcript its popover pulls from, falling back to the `transcript:` key when the target isn't a
+  known transcript page.
 - Never modify `raw/`. The transcript pages under `wiki/` are editable (only heading brackets change).
