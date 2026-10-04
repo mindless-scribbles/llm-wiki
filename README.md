@@ -20,7 +20,7 @@ Three operations drive the workflow:
 |-----------|---------|--------------|
 | **Ingest** | "ingest raw/my-source.txt" | LLM reads the source, creates a summary page, creates/updates concept and entity pages, adds cross-links, updates the index and log, and rebuilds the HTML site |
 | **Query** | Ask any question | LLM searches the wiki, synthesizes an answer with citations, optionally creates a synthesis page for novel insights |
-| **Lint** | "lint" or "health check" | LLM audits all pages for orphans, contradictions, missing links, incomplete sections, and low-confidence claims — fixes what it can, reports the rest |
+| **Lint** | "lint" or "health check" | LLM audits all pages for orphans, contradictions, missing links, incomplete sections, and low-confidence claims, runs `llm-wiki-site lint` on the writing — fixes what it can, reports the rest |
 
 ## Quick Start
 
@@ -125,9 +125,13 @@ Live queries that surface low-confidence pages, recent updates, concepts by tag,
 
 Visual analytics with pie charts, bar charts, and word clouds. Requires the [Charts View](https://github.com/caronchen/obsidian-chartsview-plugin) Obsidian plugin.
 
-### Mermaid Diagrams
+### Writing Rule (STE-80)
 
-Use Mermaid code blocks in any wiki page to create flowcharts, sequence diagrams, or concept maps. Native support in Obsidian and GitHub.
+Pages follow the writing rules of [ASD-STE100](https://www.asd-ste100.org/) (Simplified Technical English), about 80% of the way: short steps that start with a verb, sentence and paragraph limits, plain words, and one word for each thing (a per-wiki Terminology table in `CLAUDE.md`). `llm-wiki-site lint` measures it and reports; the LLM fixes. The STE dictionary is deliberately not used: it rejects a domain's own terms.
+
+### Diagrams (`add-diagram` skill)
+
+Structure is drawn as Mermaid code blocks, using the UML diagram types: state diagrams for modes, sequence diagrams for an order of calls, component diagrams for connected parts. Obsidian renders them natively; `llm-wiki-site` renders them to inline SVG in the DDC Reel look when [`mmdc`](https://github.com/mermaid-js/mermaid-cli) is installed. The `add-diagram` skill (`.claude/skills/add-diagram/`) holds the rules: which type, top-down layout, the page's own words, one caption.
 
 ### Marp Slides (`wiki/presentations/`)
 
