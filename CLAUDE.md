@@ -40,7 +40,7 @@ One word for each thing. The lint flags every term in the `Not` column, except i
 - `wiki/syntheses/` — Comparison tables, decision frameworks, cross-cutting analyses.
 - `wiki/journal/` — Research or session journal entries.
 - `wiki/presentations/` — Marp slide decks generated from wiki content.
-- `wiki/tutorials/` — Step-by-step, timecode-linked tutorials distilled from timecoded transcript pages (mirrors the source page's path under `wiki/`). Each step links to the exact transcript moment — a heading link in Obsidian, a click-to-popover on the site. See the **Add Tutorial** workflow and the `add-tutorial` skill.
+- `wiki/tutorials/` — Step-by-step, timecode-linked tutorials (`type: lesson`) distilled from timecoded transcript pages (mirrors the source page's path under `wiki/`). Each step links to the exact transcript moment — a heading link in Obsidian, a click-to-popover on the site. See the **Add Lesson** workflow.
 - `site.config.json` — Branding for the HTML site (title, brand letters, footer, accent color). Optional; see **Branding** below.
 
 **This folder holds markdown and nothing else.** The static HTML site is built by a
@@ -62,7 +62,7 @@ Every wiki page uses this frontmatter and structure:
 ```yaml
 ---
 title: "Page Title"
-type: concept | entity | summary | synthesis
+type: concept | entity | summary | synthesis | lesson
 tags: [tag1, tag2, tag3]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
@@ -73,7 +73,7 @@ confidence: high | medium | low
 
 Tutorial pages (`wiki/tutorials/`) additionally set a `transcript: "<source-target>"` key
 naming the timecoded transcript they were distilled from — this is what enables the
-clickable-timecode popovers. See the **Add Tutorial** workflow.
+clickable-timecode popovers. See the **Add Lesson** workflow.
 
 ### Diagrams
 
@@ -103,6 +103,27 @@ of calls → sequence diagram, connected parts → component diagram). See the *
 - `## Characteristics` — Key properties, attributes, structure
 - `## Common Strategies` — Links to concept pages for strategies or methods associated with this entity
 - `## Related Entities` — Links to related entity pages
+
+**Lesson pages** (`type: lesson`, for a workshop day or a tutorial): the site renders these as a
+lesson, not an article. Write the teaching structure as these plain-markdown markers:
+- Before the first phase: `**Goal:**`, `**Result:**`, and `**Open in <app>:**` with a list: say which
+  project to open, which assets, and which parts of them today covers.
+- `## Phase N — Title (75 min)` for each phase. The minutes set its bar on the phase rail.
+  The budget must match the work in the phase. Do not pad it.
+- `**Why:**` first in every phase: what the phase teaches, and what breaks without it. A teacher
+  reads it as the syllabus line; a learner reads it as the reason to care.
+- Teach the why; let a visual carry the how. Show the graph or the screen as `@image[slug]`
+  (a capture of the reference) and explain what each part does. Do not list the wiring that
+  the capture already shows. Until the capture exists, the `@image` asks for it in review mode.
+- Numbered steps. Keep the numbers running across the page.
+- `**Ask:**` then `**Decision:**` only for a call the room could get wrong: the wrong answer is
+  tempting and costs something you can see. The site hides the decision behind a reveal.
+  Otherwise state it as a fact with a bold lead: `**Project, don't copy.** …`.
+- `**Predict:**` before a test, then `**Read:**` for what to observe. The site hides the read-off until the reader checks.
+- A line that starts with `⚠️` for a trap. A `> quote` for the line to remember.
+- One visual per phase where you can: a Mermaid fence, `@image[slug]`, `@video[slug]` or `@viz[slug]`.
+  A one-line paragraph ending in `:` before it is its title; one sentence after it is its caption.
+- `## Related` last.
 
 **Synthesis pages** (`wiki/syntheses/`):
 - `## Comparison` — Table or structured comparison
@@ -156,21 +177,20 @@ When the user says "ingest [source]" or adds a file to `raw/`:
 10. Run `llm-wiki-site lint .` and fix what it flags on the pages you touched.
 11. **Rebuild the HTML site**: run `llm-wiki-site build .` (see Publish). This is a default step of every ingest — the site should never lag the wiki.
 
-### Add Tutorial
+### Add Lesson
 
-When the user wants a **step-by-step tutorial** from a timecoded transcript (a page whose
-headings are `## MM:SS`), or asks to "break this lesson into steps" / "tie each step to a
-timecode", run the **`add-tutorial`** skill. In short:
+This wiki has two layers. The reference pages (concepts, entities, theory) explain how things
+work; **Ingest** builds them. Lessons (`type: lesson`) teach it in order, as a workshop or a
+tutorial. When the user asks for a workshop, a lesson, a tutorial or a step-by-step, run the
+global **`add-lesson`** skill. In short:
 
-1. Normalize the transcript's timecode headings to have no brackets (`## [MM:SS]` → `## MM:SS`) —
-   Obsidian can't link to headings containing `[`/`]`.
-2. Write `wiki/tutorials/<same-path-as-source>.md` with a `transcript: "<source-target>"` key and
-   phased, numbered steps. Every step opens with a timecode wikilink `[[wiki/<source-target>#MM:SS|MM:SS]]`
-   whose `MM:SS` exactly matches a transcript heading (`HH:MM:SS` past the hour).
-3. Update `index.md` (a "Tutorials — Step-by-Step" section) and `log.md`, then rebuild.
-
-`llm-wiki-site` renders those timecode wikilinks as pills that pop up the transcript chunk
-inline on the site, and they double as heading links in Obsidian. See `.claude/skills/add-tutorial/SKILL.md`.
+1. If there is no course overview, draft the syllabus first (who, prerequisites, each lesson's Why
+   and outcome) and get the user's OK.
+2. Write one pilot lesson to the **Lesson pages** rules above, then review it with the user before
+   writing the rest.
+3. Evidence for each step is either a reference (snapshot in `raw/`, plus screen captures as
+   `@image` slots) or a timecoded transcript (timecode pills; lessons go in `wiki/tutorials/`).
+4. Update `index.md` and `log.md`, then rebuild.
 
 ### Add Diagram
 
@@ -186,6 +206,21 @@ When a page describes structure in prose, or the user asks for a diagram, run th
 4. Check it renders (`mmdc`), update `index.md` and `log.md`, then rebuild.
 
 See `.claude/skills/add-diagram/SKILL.md`.
+
+### Review
+
+The human reads the site on the local server and leaves notes on it. Run the global
+**`work-notes`** skill when they say "work the notes". In short:
+
+- One server serves every registered wiki: `llm-wiki-site serve`, then
+  `http://127.0.0.1:4173/<wiki-id>/`. Notes are always on there. The files in the build output stay clean.
+- A **content** note is about what a page says: fix it in this wiki's markdown. Go back to `raw/`,
+  or research, when the page cannot answer it. A **design** note is about how every page of a
+  kind is laid out: it is fixed in `llm-wiki-site`, never here.
+- A pasted screenshot goes to the builder's `sites/<wiki-id>/media/<slug>.png` and onto the page
+  as `@image[slug] caption`. Never into this folder.
+- Resolve each note with what changed (`llm-wiki-site notes resolve <note-id> -m "..."`), then
+  update `index.md` and `log.md` and rebuild.
 
 ### Publish
 
