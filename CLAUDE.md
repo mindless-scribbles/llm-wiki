@@ -108,7 +108,7 @@ Old ```` ```mermaid ```` fences still render on the site as a legacy fallback; d
 lesson, not an article. Write the teaching structure as these plain-markdown markers:
 - Before the first phase: `**Goal:**`, `**Result:**`, and `**Open in <app>:**` with a list: say which
   project to open, which assets, and which parts of them today covers.
-- `## Phase N — Title (75 min)` for each phase. The minutes set its bar on the phase rail.
+- `## Phase N — Title (75 min)` for each phase. The minutes add up to the day's total in the page head.
   The budget must match the work in the phase. Do not pad it.
 - `**Why:**` first in every phase: what the phase teaches, and what breaks without it. A teacher
   reads it as the syllabus line; a learner reads it as the reason to care.
@@ -122,7 +122,7 @@ lesson, not an article. Write the teaching structure as these plain-markdown mar
 - `**Predict:**` before a test, then `**Read:**` for what to observe. The site hides the read-off until the reader checks.
 - A line that starts with `⚠️` for a trap. A `> quote` for the line to remember.
 - One visual per phase where you can: `@diagram[slug]`, `@image[slug]`, `@video[slug]` or `@viz[slug]`.
-  A one-line paragraph ending in `:` before it is its title; one sentence after it is its caption.
+  Lead into it with a one-line paragraph ending in `:`; its caption goes on the marker line.
 - `## Related` last.
 
 **Synthesis pages** (`wiki/syntheses/`):
