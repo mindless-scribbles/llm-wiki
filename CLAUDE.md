@@ -77,10 +77,10 @@ clickable-timecode popovers. See the **Add Lesson** workflow.
 
 ### Diagrams
 
-Draw structure as a ```` ```mermaid ```` block in the page: never an image file, never ASCII art.
-Obsidian renders it natively, and `llm-wiki-site` renders it to inline SVG in the DDC Reel look.
-Pick the UML diagram type that matches what the prose describes (modes → state diagram, an order
-of calls → sequence diagram, connected parts → component diagram). See the **Add Diagram** workflow.
+Draw structure as an editorial SVG, mounted with an `@diagram[slug] caption` line: never a Mermaid
+block, never ASCII art. The global **`add-diagram`** skill draws it (see the **Add Diagram**
+workflow). The SVG lives in the builder at `sites/<wiki-id>/diagrams/`, not in the vault.
+Old ```` ```mermaid ```` fences still render on the site as a legacy fallback; do not write new ones.
 
 ### Required Sections by Page Type
 
@@ -121,7 +121,7 @@ lesson, not an article. Write the teaching structure as these plain-markdown mar
   Otherwise state it as a fact with a bold lead: `**Project, don't copy.** …`.
 - `**Predict:**` before a test, then `**Read:**` for what to observe. The site hides the read-off until the reader checks.
 - A line that starts with `⚠️` for a trap. A `> quote` for the line to remember.
-- One visual per phase where you can: a Mermaid fence, `@image[slug]`, `@video[slug]` or `@viz[slug]`.
+- One visual per phase where you can: `@diagram[slug]`, `@image[slug]`, `@video[slug]` or `@viz[slug]`.
   A one-line paragraph ending in `:` before it is its title; one sentence after it is its caption.
 - `## Related` last.
 
@@ -169,7 +169,7 @@ When the user says "ingest [source]" or adds a file to `raw/`:
 2. Create `wiki/summaries/<source-slug>.md` with full summary
 3. Identify all concepts, entities, and strategies mentioned
 4. For each concept/entity: create the page if it doesn't exist, or update it with new information if it does. Write to the **Writing Rule**, and use the Terminology table's words. If a source names a thing the table doesn't cover yet, add a row.
-5. Where a page describes modes and the switches between them, an order of calls or writes, or parts that connect, add a diagram (**Add Diagram**). Skip it when a numbered list or a table already shows the structure.
+5. Where a page describes modes and the switches between them, an order of calls or writes, or parts that connect, add a diagram with `@diagram` (**Add Diagram**). Skip it when a numbered list or a table already shows the structure.
 6. Add cross-links in both directions between all touched pages
 7. Update `wiki/index.md` — add new entries, update summaries of changed pages
 8. Append to `wiki/log.md` with timestamp, source name, pages created/updated
@@ -194,18 +194,18 @@ global **`add-lesson`** skill. In short:
 
 ### Add Diagram
 
-When a page describes structure in prose, or the user asks for a diagram, run the
-**`add-diagram`** skill. In short:
+When a page describes structure in prose, or the user asks for a diagram, run the global
+**`add-diagram`** skill (`~/.claude/skills/add-diagram/SKILL.md`; this wiki has no copy). In short:
 
-1. Pick the diagram type from what the prose describes: modes → `stateDiagram-v2`; an order of
-   calls → `sequenceDiagram`; connected parts → `flowchart` with subgraphs; steps with branches →
-   `flowchart TD`; types and fields → `classDiagram`.
-2. Lay it out top-down, keep it to about 12 nodes, and label it with the page's own terms.
-3. Put it in the section it explains, follow it with a one-sentence caption, and remove any
-   prose list or ASCII drawing it replaces.
-4. Check it renders (`mmdc`), update `index.md` and `log.md`, then rebuild.
-
-See `.claude/skills/add-diagram/SKILL.md`.
+1. Pick the type from what the prose describes: modes → state machine; an order of calls →
+   sequence; connected parts → architecture; two or more actors → swimlane; a hierarchy → tree;
+   steps with branches → flowchart; events in time → timeline.
+2. Draw it at the column's width (704), with the page's own words, and one accent on the one or two
+   things the page is about.
+3. Mount it with `@diagram[slug] caption` in the section it explains, with one caption sentence.
+   Replace any prose list or ASCII drawing it shows; do not duplicate it.
+4. Keep the three files (spec `.md`, `.html`, exported `.svg`) in the builder at
+   `sites/<wiki-id>/diagrams/`, never in the vault. Update `log.md`, then rebuild.
 
 ### Review
 
@@ -241,8 +241,9 @@ llm-wiki-site build --site <wiki-id>
 - Optionally, give a concept page an interactive visualization by adding
   `sites/<wiki-id>/widgets/<slug>.js` **in the builder repo** (slug = concept
   filename). The build injects it automatically.
-- ```` ```mermaid ```` blocks render as inline SVG when `mmdc` (`@mermaid-js/mermaid-cli`) is
-  on `PATH`. Without it they stay code blocks on the site, and Obsidian still draws them.
+- Diagrams are `@diagram[slug]` lines. Their SVGs live in `sites/<wiki-id>/diagrams/` in the builder
+  repo. Old ```` ```mermaid ```` fences still render as a legacy fallback (inline SVG when `mmdc` is
+  on `PATH`, else code blocks); new diagrams do not use them.
 - Requires Node 18+. No dependencies and no network needed to build.
 
 #### Branding
@@ -288,7 +289,7 @@ When the user asks a question:
 When the user says "lint" or "health check":
 
 1. Read all wiki pages
-2. Check for: orphan pages (no inbound links), stale claims, contradictions between pages, missing cross-links, incomplete sections, low-confidence pages that could be strengthened, and pages that describe modes, call orders or connected parts with no diagram
+2. Check for: orphan pages (no inbound links), stale claims, contradictions between pages, missing cross-links, incomplete sections, low-confidence pages that could be strengthened, and pages that describe modes, call orders or connected parts with no `@diagram` (add one with the global `add-diagram` skill)
 3. Run `llm-wiki-site lint .` (the Writing Rule's limits and the Terminology table). Rewrite each flagged sentence; keep every name, number and citation.
 4. Fix what can be fixed automatically
 5. Report issues that need human judgment

@@ -129,9 +129,9 @@ Visual analytics with pie charts, bar charts, and word clouds. Requires the [Cha
 
 Pages follow the writing rules of [ASD-STE100](https://www.asd-ste100.org/) (Simplified Technical English), about 80% of the way: short steps that start with a verb, sentence and paragraph limits, plain words, and one word for each thing (a per-wiki Terminology table in `CLAUDE.md`). `llm-wiki-site lint` measures it and reports; the LLM fixes. The STE dictionary is deliberately not used: it rejects a domain's own terms.
 
-### Diagrams (`add-diagram` skill)
+### Diagrams (global `add-diagram` skill)
 
-Structure is drawn as Mermaid code blocks, using the UML diagram types: state diagrams for modes, sequence diagrams for an order of calls, component diagrams for connected parts. Obsidian renders them natively; `llm-wiki-site` renders them to inline SVG in the DDC Reel look when [`mmdc`](https://github.com/mermaid-js/mermaid-cli) is installed. The `add-diagram` skill (`.claude/skills/add-diagram/`) holds the rules: which type, top-down layout, the page's own words, one caption.
+Structure is drawn as editorial SVGs in the DDC Reel look and mounted in a page with an `@diagram[slug] caption` line. The global `add-diagram` skill (`~/.claude/skills/add-diagram/`) holds the rules: which type, the 704 column, the page's own words, one accent, one caption. The SVGs live in the builder at `sites/<wiki-id>/diagrams/`, not in the vault. Old Mermaid fences still render as a legacy fallback; new diagrams do not use them.
 
 ### Marp Slides (`wiki/presentations/`)
 
